@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Modern JS target
+    "module": "CommonJS", // Use ES modules
+    "moduleResolution": "Node", // Node module resolution
+    "esModuleInterop": true, // Enables default import compatibility
+    "strict": true, // Enable strict type-checking
+    "skipLibCheck": true, // Skip checking declaration files to speed up build
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["./src/**/*", "index.ts"] // Include your source files and entry point
+}
