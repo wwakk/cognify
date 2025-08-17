@@ -27,7 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/api/ocrApi.ts"
+    "src/api/ocrApi.ts",
+    "src"
   ],
   "exclude": ["node_modules", ".env"]
 }

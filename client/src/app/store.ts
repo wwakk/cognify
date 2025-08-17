@@ -1,13 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { ocrApi } from "@/api/ocrApi";
+import { chatgptApi } from "@/api/chatgptApi";
 
 export const store = configureStore({
   reducer: {
     [ocrApi.reducerPath]: ocrApi.reducer,
-    // your other reducers here
+    [chatgptApi.reducerPath]: chatgptApi.reducer,
+    // other reducers here
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(ocrApi.middleware),
+    getDefaultMiddleware().concat(ocrApi.middleware, chatgptApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { useGetParsedImageMutation } from "@/api/ocrApi"; // Adjust the import path
+import { useGetParsedImageMutation } from "@/api/ocrApi";
+import { useGetChatGPTResponseMutation } from "@/api/chatgptApi";
 
 const UploadBox = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -10,6 +11,7 @@ const UploadBox = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [parseImage, { isLoading }] = useGetParsedImageMutation();
+  const [chatGPTResponse] = useGetChatGPTResponseMutation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,17 +47,27 @@ const UploadBox = () => {
 
     setSolution(null);
 
-    const formData = new FormData();
-    formData.append("image", selectedImage);
-
     try {
-      const data = await parseImage(formData).unwrap();
-      const parsedText =
-        data?.ParsedResults?.[0]?.ParsedText || "No text found.";
-      setSolution(parsedText);
+      // 1️⃣ Create FormData correctly
+      const formData = new FormData();
+      formData.append("image", selectedImage);
+
+      // 2️⃣ Call OCR API
+      const ocrData = await parseImage(formData).unwrap();
+      const extractedText = ocrData?.ParsedResults?.[0]?.ParsedText;
+      if (!extractedText) {
+        setSolution("No text found in image.");
+        return;
+      }
+
+      // 3️⃣ Call ChatGPT API
+      const chatData = await chatGPTResponse({
+        text: extractedText,
+      }).unwrap();
+      setSolution(chatData?.content || "No response from ChatGPT.");
     } catch (error) {
-      console.error("OCR error:", error);
-      setSolution("Error processing OCR.");
+      console.error("Error:", error);
+      setSolution("Error processing image or AI request.");
     }
   };
 
@@ -110,7 +122,7 @@ const UploadBox = () => {
           {solution && (
             <div className="w-full bg-zinc-600 p-4 rounded text-left mt-4 whitespace-pre-wrap">
               <h3 className="text-md text-white font-semibold mb-1">
-                OCR Result:
+                Response:
               </h3>
               <p className="text-white">{solution}</p>
             </div>
