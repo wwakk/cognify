@@ -14,7 +14,7 @@ export const handleChatGPT = async (req: Request, res: Response) => {
     const { text } = req.body; // text comes from OCR
 
     const response = await openai.chat.completions.create({
-      model: "gpt-5-mini",
+      model: "gpt-5-nano",
       messages: [{ role: "user", content: text }],
     });
 
