@@ -7,7 +7,16 @@ export const chatgptApi = createApi({
     getChatGPTResponse: builder.mutation<{ content: string }, { text: string }>(
       {
         query: (body) => ({
-          url: "chat", // your chat endpoint
+          url: "openai/solve",
+          method: "POST",
+          body,
+        }),
+      }
+    ),
+    getChatGPTProblems: builder.mutation<{ content: string }, { text: string }>(
+      {
+        query: (body) => ({
+          url: "openai/problems",
           method: "POST",
           body,
         }),
@@ -16,4 +25,5 @@ export const chatgptApi = createApi({
   }),
 });
 
-export const { useGetChatGPTResponseMutation } = chatgptApi;
+export const { useGetChatGPTResponseMutation, useGetChatGPTProblemsMutation } =
+  chatgptApi;

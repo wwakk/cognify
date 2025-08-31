@@ -17,7 +17,7 @@ app.use(
 app.use(express.json()); // if you want to parse JSON bodies on other routes
 
 app.use("/api/ocr", ocrRoutes);
-app.use("/api/chat", chatgptRoutes);
+app.use("/api/openai", chatgptRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
