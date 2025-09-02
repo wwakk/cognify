@@ -56,12 +56,12 @@ const UploadBox = () => {
       const extractedText = ocrData?.ParsedResults?.[0]?.ParsedText;
 
       if (!extractedText) {
-        setSolution("No text found in image.");
+        setSolution("No text found in image. Try a clearer image.");
         return;
       }
 
       const chatData = await chatGPTResponse({ text: extractedText }).unwrap();
-      setSolution(chatData?.content || "No response from ChatGPT.");
+      setSolution(chatData?.content || "No response from AI.");
     } catch (error) {
       setSolution("Error processing image or AI request.");
     }
@@ -78,7 +78,7 @@ const UploadBox = () => {
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
-      className="mt-12 w-full max-w-4xl p-6 bg-[var(--foreground)]/10 rounded-2xl shadow-xl text-center cursor-pointer"
+      className="mt-12 w-full max-w-4xl p-6 bg-white rounded-2xl shadow-xl text-center cursor-pointer"
       onClick={handleClick}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -112,7 +112,7 @@ const UploadBox = () => {
           </div>
 
           {solution && (
-            <div className="w-full bg-white/80 dark:bg-zinc-900 p-4 rounded-lg mt-4 text-left text-black whitespace-pre-wrap shadow-inner">
+            <div className="w-full bg-white/80 dark:bg-zinc-100 p-4 rounded-lg mt-4 text-left text-black whitespace-pre-wrap shadow-inner">
               <h4 className="font-semibold mb-1">Response:</h4>
               <p>{solution}</p>
             </div>

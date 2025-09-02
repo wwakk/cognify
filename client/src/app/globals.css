@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ===== Root variables ===== */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,35 +13,126 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Apply box-sizing globally to avoid overflow */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
+/* ===== Gradient animation ===== */
 @keyframes gradient-wave {
   0% {
     background-position: 0% 50%;
   }
   100% {
-    background-position: 200% 50%; /* Moves across fully */
+    background-position: 200% 50%;
   }
 }
 
 .animate-gradient-wave {
-  background: linear-gradient(
-    270deg,
-    #de2160,
-    #3e21de,
-    #de2160 /* back to rose */
-  );
+  background: linear-gradient(270deg, #de2160, #3e21de, #de2160);
   background-size: 400% 400%;
-  animation: gradient-wave 3s linear infinite; /* smooth, one-direction */
+  animation: gradient-wave 3s linear infinite;
 }
 
+/* ===== Base body ===== */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Hide default Amplify tabs ===== */
+.amplify-tabs__list,
+.amplify-tabs__item,
+.amplify-tabs__indicator {
+  display: none !important;
+}
+
+:root,
+.amplify-authenticator {
+  --amplify-components-tabs-item-active-border-color: transparent;
+  --amplify-components-tabs-item-border-color: transparent;
+  --amplify-components-tabs-item-color: inherit;
+  --amplify-components-tabs-item-active-color: inherit;
+}
+
+/* ===== Auth container ===== */
+.amplify-authenticator > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 1rem !important; /* Round the corners */
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0) !important; /* Add a soft shadow */
+  border: none !important; /* Remove the border completely */
+  padding: 2rem !important; /* Add padding inside the container */
+  overflow: hidden !important; /* Prevent any overflow */
+}
+
+/* ===== Inputs ===== */
+.amplify-input,
+.amplify-passwordfield__input {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== Password field toggle button ===== */
+.amplify-passwordfield__button {
+  background: transparent !important;
+  border-left: 1px solid #e5e7eb !important;
+  padding: 0 0.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #171717 !important;
+  transition: all 0.1s ease-in-out !important;
+  cursor: pointer !important;
+  border-radius: 0 0.75rem 0.75rem 0 !important;
+  height: 100% !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+}
+
+.amplify-passwordfield__button:hover {
+  background: rgba(212, 212, 212, 0.08) !important;
+  color: #b4b4b4 !important;
+}
+
+.amplify-passwordfield__button:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(215, 215, 215, 0.3) !important;
+}
+
+/* ===== Primary button ===== */
+.amplify-button--primary {
+  background: linear-gradient(to right, #de2160, #8e21de, #3e21de) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 1rem !important;
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  margin-top: 1rem !important;
+  text-align: center !important;
+  transition: all 0.3s ease-in-out !important;
+  box-shadow: #171717 !important;
+}
+
+.amplify-button--primary:hover {
+  filter: brightness(1.1) !important;
+  transform: translateY(-2px);
+}
+
+/* ===== Focus states ===== */
+.amplify-input:focus,
+.amplify-passwordfield__input:focus,
+.amplify-button:focus,
+.amplify-passwordfield__button:focus {
+  outline: none !important;
+  border: 1.5px solid #171717 !important;
+  box-shadow: 0 0 0 0px rgba(0, 0, 0, 0) !important;
+  border-color: #171717 !important;
 }
