@@ -15,7 +15,14 @@ export const handleChatGPT = async (req: Request, res: Response) => {
 
     const response = await openai.chat.completions.create({
       model: "gpt-5-nano",
-      messages: [{ role: "user", content: text }],
+      messages: [
+        {
+          role: "user",
+          content:
+            "Observe the questions and make sure to answer correctly while also providing an explanation for the solution." +
+            text,
+        },
+      ],
     });
 
     // Send AI response back

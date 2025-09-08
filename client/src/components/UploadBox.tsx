@@ -2,8 +2,12 @@
 
 import React, { useRef, useState } from "react";
 import { useGetParsedImageMutation } from "@/api/ocrApi";
-import { useGetChatGPTResponseMutation } from "@/api/chatgptApi";
+import {
+  useGetChatGPTProblemsMutation,
+  useGetChatGPTResponseMutation,
+} from "@/api/chatgptApi";
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 const UploadBox = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -11,9 +15,19 @@ const UploadBox = () => {
   const [solution, setSolution] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const [parseImage, { isLoading: ocrLoading }] = useGetParsedImageMutation();
-  const [chatGPTResponse, { isLoading: chatLoading }] =
-    useGetChatGPTResponseMutation();
+  const [
+    [parseImage, { isLoading: ocrLoading }],
+    [chatGPTResponse, { isLoading: chatLoading }],
+    [chatGPTProblems, { isLoading: chatProblemsLoading }],
+  ] = [
+    useGetParsedImageMutation(),
+    useGetChatGPTResponseMutation(),
+    useGetChatGPTProblemsMutation(),
+  ];
+
+  const pathname = usePathname();
+  const isSolvePage = pathname.match(/^\/(solve)$/);
+  const isPracticePage = pathname.match(/^\/(practice)$/);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,7 +66,7 @@ const UploadBox = () => {
       const formData = new FormData();
       formData.append("image", selectedImage);
 
-      const ocrData = await parseImage(formData).unwrap();
+      const ocrData = await parseImage(formData).unwrap(); //call OCR API
       const extractedText = ocrData?.ParsedResults?.[0]?.ParsedText;
 
       if (!extractedText) {
@@ -60,7 +74,16 @@ const UploadBox = () => {
         return;
       }
 
-      const chatData = await chatGPTResponse({ text: extractedText }).unwrap();
+      // Different API behavior based on URL
+      let chatData;
+      if (isSolvePage) {
+        chatData = await chatGPTResponse({ text: extractedText }).unwrap();
+      } else if (isPracticePage) {
+        chatData = await chatGPTProblems({
+          text: extractedText,
+        }).unwrap();
+      }
+
       setSolution(chatData?.content || "No response from AI.");
     } catch (error) {
       setSolution("Error processing image or AI request.");
@@ -101,7 +124,13 @@ const UploadBox = () => {
               disabled={ocrLoading || chatLoading}
               className="flex-1 px-4 py-2 rounded-xl text-white bg-gradient-to-r from-[#de2160] via-[#8e21de] to-[#3e21de] shadow-lg hover:opacity-50 transition disabled:opacity-50 cursor-pointer"
             >
-              {ocrLoading || chatLoading ? "Solving..." : "Solve"}
+              {ocrLoading || chatLoading || chatProblemsLoading
+                ? isSolvePage
+                  ? "Generating..."
+                  : "Solving..."
+                : isPracticePage
+                ? "Generate Problems"
+                : "Solve"}
             </button>
             <button
               onClick={handleRemove}
