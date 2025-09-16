@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import UploadBox from "@/components/UploadBox";
 import Link from "next/link";
 import Header from "@/components/Header";
+import DashboardBox from "@/components/DashboardBox";
 
 const SolvePage = () => {
   return (
@@ -68,34 +69,7 @@ const SolvePage = () => {
           </div>
         </motion.section>
 
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="w-full py-16 bg-gradient-to-r from-[#de2160] via-[#8e21de] to-[#3e21de] text-white text-center rounded-2xl max-w-4xl px-6"
-        >
-          <h3 className="text-3xl font-bold mb-4">
-            Want to Save Your Progress?
-          </h3>
-          <p className="mb-6 opacity-80 text-white text-lg">
-            Create a free account to save solutions, track progress, and
-            generate personalized practice problems tailored to your learning.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              href="/signup"
-              className="px-6 py-3 rounded-xl font-medium border-2 border-white bg-white text-black hover:bg-transparent hover:text-white transition"
-            >
-              Create Account
-            </Link>
-            <Link
-              href="/signin"
-              className="px-6 py-3 rounded-xl font-medium border-2 border-white hover:bg-white hover:text-black transition"
-            >
-              Sign In
-            </Link>
-          </div>
-        </motion.section>
+        <DashboardBox />
       </div>
     </Provider>
   );

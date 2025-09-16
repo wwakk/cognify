@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Amplify } from "aws-amplify";
 import {
   Authenticator,
   Heading,
@@ -10,17 +9,6 @@ import {
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { useRouter, usePathname } from "next/navigation";
-
-// Amplify configuration
-Amplify.configure({
-  Auth: {
-    Cognito: {
-      userPoolId: process.env.NEXT_PUBLIC_AWS_COGNITO_USER_POOL_ID!,
-      userPoolClientId:
-        process.env.NEXT_PUBLIC_AWS_COGNITO_USER_POOL_CLIENT_ID!,
-    },
-  },
-});
 
 // Custom Authenticator components
 const components = {
@@ -130,23 +118,27 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
     }
   }, [user, isAuthPage, router]);
 
+  if (!isAuthPage) {
+    return <>{children}</>;
+  }
+
   return (
-    <div className="min-h-screen bg-white flex justify-center items-center px-4 py-8">
-      {" "}
-      {/* Adjusted padding here */}
-      <div className="bg-white rounded-2xl shadow-xl py-12 w-full max-w-xl">
-        {" "}
-        {/* Changed max-w-md to max-w-lg */}
-        <Authenticator
-          initialState={pathname.includes("signup") ? "signUp" : "signIn"}
-          components={components}
-          formFields={formFields}
-          className="border-none"
-        />
-        {/* Render children outside Authenticator if needed */}
-        {!isAuthPage && children}
-      </div>
-    </div>
+    <>
+      {isAuthPage ? (
+        <div className="min-h-screen bg-white flex justify-center items-center px-4 py-8">
+          <div className="bg-white rounded-2xl shadow-xl py-12 w-full max-w-xl">
+            <Authenticator
+              initialState={pathname.includes("signup") ? "signUp" : "signIn"}
+              components={components}
+              formFields={formFields}
+              className="border-none"
+            />
+          </div>
+        </div>
+      ) : (
+        children
+      )}
+    </>
   );
 };
 

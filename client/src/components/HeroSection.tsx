@@ -4,11 +4,14 @@ import { motion } from "framer-motion";
 import { FileText, BookOpen } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useGetAuthUserQuery } from "@/api/authApi";
+import DashboardBox from "./DashboardBox";
 
 // Framer Motion + Next Link combo
 const MotionLink = motion(Link);
 
 const HeroSection = () => {
+  const { data: user, error, isLoading } = useGetAuthUserQuery();
   const [activeTab, setActiveTab] = useState<"homework" | "practice">(
     "homework"
   );
@@ -79,35 +82,7 @@ const HeroSection = () => {
           </p>
         </MotionLink>
       </motion.div>
-
-      {/* Signup Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.8 }}
-        className="mt-20 w-full py-16 shadow-2xl bg-gradient-to-r from-[#de2160] via-[#8e21de] to-[#3e21de] text-white text-center rounded-2xl mx-2"
-      >
-        <h3 className="text-3xl font-bold mb-4">Sign Up or Sign In</h3>
-        <p className="mb-6 opacity-80">
-          Get personalized AI solutions and track your learning progress.
-        </p>
-        <div className="flex justify-center gap-4">
-          <MotionLink
-            href="/signup"
-            whileHover={{ scale: 1.05 }}
-            className="px-6 py-3 rounded-xl font-medium border-2 border-white bg-white text-black hover:bg-transparent hover:text-white transition"
-          >
-            Sign Up
-          </MotionLink>
-          <MotionLink
-            href="/signin"
-            whileHover={{ scale: 1.05 }}
-            className="px-6 py-3 rounded-xl font-medium border-2 border-white hover:bg-white hover:text-black transition"
-          >
-            Sign In
-          </MotionLink>
-        </div>
-      </motion.section>
+      <DashboardBox />
     </div>
   );
 };

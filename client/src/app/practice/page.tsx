@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import UploadBox from "@/components/UploadBox";
 import Link from "next/link";
 import Header from "@/components/Header";
+import DashboardBox from "@/components/DashboardBox";
 
 const PracticePage = () => {
   return (
@@ -24,8 +25,8 @@ const PracticePage = () => {
             Practice Makes Perfect
           </h1>
           <p className="mt-4 text-black opacity-80 text-lg">
-            Upload notes or topics and receive practice problems with thought
-            out solutions. Review, retry, and build mastery with each attempt.
+            Upload notes or topics and receive practice problems with worked out
+            solutions. Review, retry, and build mastery with each attempt.
           </p>
         </motion.div>
 
@@ -53,21 +54,22 @@ const PracticePage = () => {
             <div className="p-6 bg-white rounded-2xl shadow-xl">
               <h4 className="text-black font-semibold mb-2">1. Upload</h4>
               <p className="text-black text-sm opacity-70">
-                Add your notes or topics you want to practice — math, physics,
-                chemistry, and more.
+                Upload notes, assignments, or topics you want to study.
               </p>
             </div>
             <div className="p-6 bg-white rounded-2xl shadow-xl">
-              <h4 className="text-black font-semibold mb-2">2. Try It First</h4>
+              <h4 className="text-black font-semibold mb-2">2. Generation</h4>
               <p className="text-black text-sm opacity-70">
-                Attempt the problem yourself before revealing the solution.
+                AI creates custom practice problems from your material.
               </p>
             </div>
             <div className="p-6 bg-white rounded-2xl shadow-xl">
-              <h4 className="text-black font-semibold mb-2">3. Step-by-Step</h4>
+              <h4 className="text-black font-semibold mb-2">
+                3. Practice & Learn
+              </h4>
               <p className="text-black text-sm opacity-70">
-                Compare your work with the guided solution and learn from your
-                mistakes.
+                Try on your own first, then reveal step-by-step solutions to
+                check your work.
               </p>
             </div>
           </div>
@@ -103,35 +105,7 @@ const PracticePage = () => {
           </div>
         </motion.section>
 
-        {/* Call to Action */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="w-full py-16 bg-gradient-to-r from-[#de2160] via-[#8e21de] to-[#3e21de] text-white text-center rounded-2xl max-w-4xl px-6"
-        >
-          <h3 className="text-3xl font-bold mb-4">
-            Ready to Level Up Your Learning?
-          </h3>
-          <p className="mb-6 opacity-80 text-white text-lg">
-            Create a free account to save your practice history, track progress,
-            and unlock unlimited practice sets.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              href="/signup"
-              className="px-6 py-3 rounded-xl font-medium border-2 border-white bg-white text-black hover:bg-transparent hover:text-white transition"
-            >
-              Create Account
-            </Link>
-            <Link
-              href="/signin"
-              className="px-6 py-3 rounded-xl font-medium border-2 border-white hover:bg-white hover:text-black transition"
-            >
-              Sign In
-            </Link>
-          </div>
-        </motion.section>
+        <DashboardBox />
       </div>
     </Provider>
   );

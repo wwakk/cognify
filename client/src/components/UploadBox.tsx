@@ -9,12 +9,20 @@ import {
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
+import {
+  useUploadAndStoreMutation,
+  useUploadToS3Mutation,
+} from "@/api/uploadsApi";
+
+import { useGetAuthUserQuery } from "@/api/authApi";
+
 const UploadBox = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [solution, setSolution] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
   const [
     [parseImage, { isLoading: ocrLoading }],
     [chatGPTResponse, { isLoading: chatLoading }],
@@ -25,9 +33,16 @@ const UploadBox = () => {
     useGetChatGPTProblemsMutation(),
   ];
 
+  //Page check
   const pathname = usePathname();
   const isSolvePage = pathname.match(/^\/(solve)$/);
   const isPracticePage = pathname.match(/^\/(practice)$/);
+
+  //Grab auth user
+  const { data: authUser, isLoading: authLoading } = useGetAuthUserQuery();
+
+  const [uploadAndStore] = useUploadAndStoreMutation();
+  const [uploadToS3] = useUploadToS3Mutation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -66,26 +81,48 @@ const UploadBox = () => {
       const formData = new FormData();
       formData.append("image", selectedImage);
 
-      const ocrData = await parseImage(formData).unwrap(); //call OCR API
+      // 1️⃣ OCR
+      const ocrData = await parseImage(formData).unwrap();
       const extractedText = ocrData?.ParsedResults?.[0]?.ParsedText;
-
       if (!extractedText) {
         setSolution("No text found in image. Try a clearer image.");
         return;
       }
 
-      // Different API behavior based on URL
-      let chatData;
-      if (isSolvePage) {
-        chatData = await chatGPTResponse({ text: extractedText }).unwrap();
-      } else if (isPracticePage) {
-        chatData = await chatGPTProblems({
-          text: extractedText,
-        }).unwrap();
-      }
+      // 2️⃣ ChatGPT
+      const chatData = isSolvePage
+        ? await chatGPTResponse({ text: extractedText }).unwrap()
+        : await chatGPTProblems({ text: extractedText }).unwrap();
+      const aiResponse = chatData?.content || "No response from AI.";
+      setSolution(aiResponse);
 
-      setSolution(chatData?.content || "No response from AI.");
+      // 3️⃣ Only upload if user is logged in
+      console.log("Auth loading:", authLoading, "AuthUser:", authUser);
+
+      if (authUser) {
+        const userId = authUser.userId;
+
+        console.log("Uploading image to S3 for user:", authUser.userId);
+
+        //const s3Data = await uploadToS3(formData).unwrap();
+        //const imageUrl = s3Data.url;
+
+        const file_name = selectedImage?.name;
+        const file_url = "exampleurl";
+
+        console.log("Storing image and AI response in DB...");
+        await uploadAndStore({
+          userId,
+          file_name,
+          file_url,
+          aiResponse,
+        }).unwrap();
+        console.log("Upload and storage successful");
+      } else {
+        console.log("User not logged in — skipping S3 and DB upload");
+      }
     } catch (error) {
+      console.error("Error processing image or AI request:", error);
       setSolution("Error processing image or AI request.");
     }
   };
@@ -100,13 +137,25 @@ const UploadBox = () => {
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      className="mt-12 w-full max-w-4xl p-6 bg-white rounded-2xl shadow-xl text-center cursor-pointer"
-      onClick={handleClick}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
+      whileHover={!previewUrl ? { scale: 1.02 } : undefined}
+      className="mt-12 w-full p-6 max-w-4xl bg-white rounded-2xl shadow-xl text-center"
+      onDrop={!previewUrl ? handleDrop : undefined}
+      onDragOver={!previewUrl ? handleDragOver : undefined}
     >
-      {previewUrl ? (
+      {!previewUrl ? (
+        <div className="cursor-pointer" onClick={handleClick}>
+          <p className="text-black opacity-60 text-lg">
+            Drag & drop an image here, or click to upload
+          </p>
+          <input
+            type="file"
+            accept="image/*"
+            ref={inputRef}
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
+      ) : (
         <div className="flex flex-col items-center space-y-4">
           <img
             src={previewUrl}
@@ -121,17 +170,20 @@ const UploadBox = () => {
                 e.stopPropagation();
                 handleSolve();
               }}
-              disabled={ocrLoading || chatLoading}
+              disabled={
+                ocrLoading || chatLoading || chatProblemsLoading || authLoading
+              }
               className="flex-1 px-4 py-2 rounded-xl text-white bg-gradient-to-r from-[#de2160] via-[#8e21de] to-[#3e21de] shadow-lg hover:opacity-50 transition disabled:opacity-50 cursor-pointer"
             >
               {ocrLoading || chatLoading || chatProblemsLoading
-                ? isSolvePage
+                ? isPracticePage
                   ? "Generating..."
                   : "Solving..."
                 : isPracticePage
-                ? "Generate Problems"
+                ? "Generate Practice"
                 : "Solve"}
             </button>
+
             <button
               onClick={handleRemove}
               className="flex-1 px-4 py-2 rounded-xl text-white bg-red-500 hover:bg-red-400 shadow-lg transition cursor-pointer"
@@ -147,19 +199,7 @@ const UploadBox = () => {
             </div>
           )}
         </div>
-      ) : (
-        <p className="text-black opacity-60 text-lg">
-          Drag & drop an image here, or click to upload
-        </p>
       )}
-
-      <input
-        type="file"
-        accept="image/*"
-        ref={inputRef}
-        onChange={handleFileChange}
-        className="hidden"
-      />
     </motion.div>
   );
 };
